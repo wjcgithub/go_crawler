@@ -13,9 +13,9 @@ import (
 func TestSave(t *testing.T) {
 
 	expected := engine.Item{
-		Url:     "http://www.7799520.com/user/595058.html",
-		Type:    "zhenai",
-		Id:      "PvLVEnMBHeXOqtUrJH1P",
+		Url:  "http://www.7799520.com/user/595058.html",
+		Type: "zhenai",
+		Id:   "PvLVEnMBHeXOqtUrJH1P",
 		Payload: model.Profile{
 			Age:        34,
 			Height:     162,
@@ -31,13 +31,6 @@ func TestSave(t *testing.T) {
 			Car:        "未购车",
 		},
 	}
-
-	// save expected item
-	err := save(expected)
-	if err != nil {
-		panic(err)
-	}
-
 	client, err := elastic.NewClient(
 		elastic.SetSniff(false),
 	)
@@ -45,10 +38,18 @@ func TestSave(t *testing.T) {
 		panic(err)
 	}
 
+	// save expected item
+	const index = "dating_test"
+	err = save(client, index, expected)
+	if err != nil {
+		panic(err)
+	}
+
 	// Fetch saved item
 	resp, err := client.Get().
-		Index("dating_profile_db").
-		Type(expected.Type).Id(expected.Id).
+		Index(index).
+		Type(expected.Type).
+		Id(expected.Id).
 		Do(context.Background())
 	if err != nil {
 		panic(err)
@@ -58,7 +59,7 @@ func TestSave(t *testing.T) {
 
 	var actual engine.Item
 	err = json.Unmarshal(resp.Source, &actual)
-	actualProfile, _:= model.FromJsonObj(actual.Payload)
+	actualProfile, _ := model.FromJsonObj(actual.Payload)
 	actual.Payload = actualProfile
 	//
 	//err = json.Unmarshal([]byte(resp.Source), &actual)
