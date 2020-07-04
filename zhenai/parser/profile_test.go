@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"imooc.com/ccmouse/learngo/crawler_concurrent/engine"
 	"imooc.com/ccmouse/learngo/crawler_concurrent/model"
 	"io/ioutil"
 	"testing"
@@ -12,32 +13,36 @@ func TestParseProfile(t *testing.T) {
 		panic(err)
 	}
 
-	result := ParseProfile(contents, "安静的雪")
+	result := ParseProfile(contents, "http://www.7799520.com/user/595058.html","安静的雪")
 	if len(result.Items) != 1 {
 		t.Errorf("Items uld containe 1 element."+
 			"element; but was %v", result.Items)
 
-		profile := result.Items[0].(model.Profile)
+		actual := result.Items[0]
 
-		expected := model.Profile{
-			Age:        34,
-			Height:     162,
-			Weight:     57,
-			Income:     "3001-5000元",
-			Gender:     "女",
-			Name:       "安静的雪",
-			Xinzuo:     "牡羊座",
-			Occupation: "人事/行政",
-			Marriage:   "离异",
-			House:      "已购房",
-			Hokou:      "山东菏泽",
-			Education:  "大学本科",
-			Car:        "未购车",
+		expected := engine.Item{
+			Url:     "http://www.7799520.com/user/595058.html",
+			Type:    "zhenai",
+			Id:      "PvLVEnMBHeXOqtUrJH1P",
+			Payload: model.Profile{
+				Age:        34,
+				Height:     162,
+				Income:     "3001-5000元",
+				Gender:     "女",
+				Name:       "安静的雪",
+				Xinzuo:     "牡羊座",
+				Occupation: "人事/行政",
+				Marriage:   "离异",
+				House:      "已购房",
+				Hokou:      "山东菏泽",
+				Education:  "大学本科",
+				Car:        "未购车",
+			},
 		}
 
-		if profile != expected {
+		if actual != expected {
 			t.Errorf("expected %v; but was %v",
-				expected, profile)
+				expected, actual)
 		}
 	}
 }

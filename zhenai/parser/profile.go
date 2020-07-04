@@ -1,11 +1,12 @@
 package parser
 
 import (
-	"imooc.com/ccmouse/learngo/crawler_concurrent/engine"
-	"imooc.com/ccmouse/learngo/crawler_concurrent/model"
 	"regexp"
 	"strconv"
 	"strings"
+
+	"imooc.com/ccmouse/learngo/crawler_concurrent/engine"
+	"imooc.com/ccmouse/learngo/crawler_concurrent/model"
 )
 
 var ageRe = regexp.MustCompile(
@@ -27,7 +28,9 @@ var hokouRe = regexp.MustCompile(
 	`<li>现居：<span>([^<]+)</span></li>`)
 var imgRe = regexp.MustCompile(`<li class="" data-uid="[0-9]+"><img src="(http://img.7799520.com/.+\.png)" alt=""></li>`)
 
-func ParseProfile(contents []byte, name string) engine.ParseResult {
+var idUrlRe = regexp.MustCompile(`http://www.7799520.com/user/([\d]+)\.html`)
+
+func ParseProfile(contents []byte, url string, name string) engine.ParseResult {
 	profile := model.Profile{}
 	profile.Name = name
 
@@ -63,7 +66,12 @@ func ParseProfile(contents []byte, name string) engine.ParseResult {
 		contents, xinzuoRe)
 
 	result := engine.ParseResult{
-		Items: []interface{}{profile},
+		Items: []engine.Item{{
+			Url:     url,
+			Type:    "zhenai",
+			Id:      extractString([]byte(url), idUrlRe),
+			Payload: profile,
+		}},
 	}
 
 	return result
@@ -75,7 +83,7 @@ func extractString(contents []byte, re *regexp.Regexp) string {
 
 	}
 	if match != nil {
-		return strings.Trim(string(match[1]), "")
+		return strings.TrimSpace(string(match[1]))
 	} else {
 		return ""
 	}
