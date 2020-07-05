@@ -27,7 +27,7 @@ func ItemSaver(index string) (chan engine.Item, error) {
 			item := <-out
 			log.Printf("Item saver got profile: #%d %v", profileCount, item)
 			profileCount++
-			err := save(client, index, item)
+			err := Save(client, index, item)
 			if err != nil {
 				fmt.Printf("Item Saver： error "+
 					" saveing item %v: %v", item, err)
@@ -38,7 +38,7 @@ func ItemSaver(index string) (chan engine.Item, error) {
 	return out, nil
 }
 
-func save(client *elastic.Client, index string, item engine.Item) error {
+func Save(client *elastic.Client, index string, item engine.Item) error {
 	if item.Type == "" {
 		return errors.New("must supply Type")
 	}
